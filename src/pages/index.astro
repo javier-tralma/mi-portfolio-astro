@@ -1,9 +1,27 @@
 ---
-// Redirect to user's preferred language or default to Spanish
-const acceptedLangs = ["es", "en"];
-const acceptLang = Astro.request.headers.get("accept-language");
-const browserLang = acceptLang?.split(",")[0]?.split("-")[0]?.toLowerCase();
-const targetLang = browserLang && acceptedLangs.includes(browserLang as "es" | "en") ? browserLang : "es";
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import HeroSection from "../components/HeroSection.astro";
+import AboutSection from "../components/AboutSection.astro";
+import BentoGrid from "../components/BentoGrid.astro";
+import SkillCloud from "../components/SkillCloud.astro";
+import DistroSection from "../components/DistroSection.astro";
+import Footer from "../components/Footer.astro";
+import { useTranslations } from "../i18n/utils";
+import "../styles/global.css";
 
-return Astro.redirect(`/${targetLang}/`);
+const lang = "es";
+const t = useTranslations(lang);
 ---
+
+<Layout title={t("meta.title")} description={t("meta.description")} lang={lang}>
+  <Navbar />
+  <main>
+    <HeroSection />
+    <AboutSection />
+    <BentoGrid />
+    <SkillCloud />
+    <DistroSection />
+  </main>
+  <Footer />
+</Layout>
