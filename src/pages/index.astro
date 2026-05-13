@@ -1,0 +1,9 @@
+---
+// Redirect to user's preferred language or default to Spanish
+const acceptedLangs = ["es", "en"];
+const acceptLang = Astro.request.headers.get("accept-language");
+const browserLang = acceptLang?.split(",")[0]?.split("-")[0]?.toLowerCase();
+const targetLang = browserLang && acceptedLangs.includes(browserLang as "es" | "en") ? browserLang : "es";
+
+return Astro.redirect(`/${targetLang}/`);
+---

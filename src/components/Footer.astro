@@ -1,0 +1,41 @@
+---
+import { Code2, Globe, Mail, Heart } from "@lucide/astro";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const socialLinks = [
+  { href: "https://github.com/javier-tralma", label: "GitHub", icon: Code2 },
+  { href: "https://linkedin.com/in/javier-tralma", label: "LinkedIn", icon: Globe },
+  { href: "mailto:jtralmagutierrez@gmail.com", label: "Email", icon: Mail },
+];
+---
+
+<footer class="relative px-6 py-16 border-t border-white/[0.06]">
+  <div class="max-w-7xl mx-auto flex flex-col items-center gap-8">
+    <div class="flex items-center gap-6">
+      {
+        socialLinks.map((link) => (
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex items-center justify-center w-12 h-12 rounded-2xl border border-white/[0.08] bg-[#141414]/60 backdrop-blur-md text-text-secondary hover:text-white hover:border-white/[0.14] hover:-translate-y-1 transition-all duration-300"
+            aria-label={link.label}
+          >
+            <link.icon class="w-5 h-5 transition-transform group-hover:scale-110" />
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="text-sm text-text-secondary flex items-center gap-1.5">
+      {t("footer.madeWith")} <Heart class="w-3.5 h-3.5 text-text-accent fill-current" /> {t("footer.using")} Astro & Tailwind
+    </p>
+
+    <p class="text-xs text-text-secondary/60">
+      {t("footer.copyright")}
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,314 @@
+---
+export interface Props {
+  name: string;
+  description: string;
+  experience: string;
+  color: string;
+  isMain?: boolean;
+  mainBadgeLabel?: string;
+}
+
+const { name, description, experience, color, isMain = false, mainBadgeLabel = "Main OS" } = Astro.props;
+
+const logoMap: Record<string, string> = {
+  "Arch Linux": "/logos/archlinux.svg",
+  "Ubuntu": "/logos/ubuntu.svg",
+  "Fedora": "/logos/fedora.svg",
+  "Linux Mint": "/logos/linuxmint.svg",
+  "Debian": "/logos/debian.svg",
+};
+
+const iconPath = logoMap[name] || "";
+
+// Convert hex to RGB for rgba() usage in CSS (better browser support than color-mix)
+function hexToRgb(hex: string): string {
+  const clean = hex.replace('#', '');
+  const bigint = parseInt(clean, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `${r}, ${g}, ${b}`;
+}
+
+const rgb = hexToRgb(color);
+---
+
+<div
+  class="distro-window group"
+  style={`
+    --distro-color: ${color};
+    --distro-rgb: ${rgb};
+  `}
+>
+  <!-- Window Header -->
+  <div class="window-header">
+    <div class="window-dots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+    <span class="window-title">{name}</span>
+    <div class="window-menu">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Window Body -->
+  <div class="window-body">
+    {isMain && (
+      <div class="main-badge">
+        <span class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></span>
+        {mainBadgeLabel}
+      </div>
+    )}
+    
+    <div class="logo-wrapper">
+      <img src={iconPath} alt={`${name} logo`} class="logo-img" loading="lazy" width="72" height="72" />
+    </div>
+
+    <h3 class="distro-name">{name}</h3>
+    <p class="distro-desc">{description}</p>
+
+    <div class="experience-badge">
+      <span class="pulse-dot"></span>
+      <span>{experience}</span>
+    </div>
+  </div>
+
+  <!-- Glow overlay on hover -->
+  <div class="glow-overlay"></div>
+</div>
+
+<style>
+  .distro-window {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 220px;
+    flex: 0 0 220px;
+    border-radius: 16px;
+    overflow: hidden;
+    background:
+      linear-gradient(160deg, rgba(var(--distro-rgb), 0.22) 0%, rgba(var(--distro-rgb), 0.08) 40%, rgba(10,10,10,0.85) 100%);
+    border: 1px solid rgba(var(--distro-rgb), 0.35);
+    box-shadow:
+      0 4px 24px rgba(0,0,0,0.5),
+      0 0 24px rgba(var(--distro-rgb), 0.25),
+      0 0 60px rgba(var(--distro-rgb), 0.12),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    scroll-snap-align: center;
+  }
+
+  .distro-window:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: rgba(var(--distro-rgb), 0.7);
+    box-shadow:
+      0 12px 40px rgba(0,0,0,0.6),
+      0 0 40px rgba(var(--distro-rgb), 0.45),
+      0 0 90px rgba(var(--distro-rgb), 0.2),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  /* Mobile/tablet scroll sizes */
+  @media (max-width: 1023px) {
+    .distro-window {
+      width: 225px;
+      flex: 0 0 225px;
+    }
+    .distro-desc {
+      font-size: 0.72rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .distro-window {
+      width: 260px;
+      flex: 0 0 260px;
+    }
+    .distro-desc {
+      font-size: 0.78rem;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .distro-window {
+      width: 240px;
+      flex: 0 0 240px;
+    }
+  }
+
+  .window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(var(--distro-rgb), 0.2);
+    background: linear-gradient(180deg, rgba(var(--distro-rgb), 0.18) 0%, transparent 100%);
+  }
+
+  .window-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    transition: all 0.3s ease;
+  }
+
+  .distro-window:hover .dot:nth-child(1) { background: #ff5f57; }
+  .distro-window:hover .dot:nth-child(2) { background: #febc2e; }
+  .distro-window:hover .dot:nth-child(3) { background: #28c840; }
+
+  .window-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.03em;
+    transition: color 0.3s;
+  }
+
+  .distro-window:hover .window-title {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .window-menu {
+    color: rgba(255, 255, 255, 0.3);
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+  }
+
+  .distro-window:hover .window-menu {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .window-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 20px 20px;
+    gap: 10px;
+    flex: 1;
+    position: relative;
+  }
+
+  .main-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--distro-color);
+    color: #000;
+    box-shadow: 0 0 12px rgba(var(--distro-rgb), 0.7);
+    z-index: 10;
+  }
+
+  .logo-wrapper {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+
+  .logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: brightness(0) invert(1) drop-shadow(0 0 14px rgba(var(--distro-rgb), 0.6));
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .distro-window:hover .logo-img {
+    transform: scale(1.14) rotate(-2deg);
+  }
+
+  .distro-name {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .distro-desc {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.55);
+    max-width: 210px;
+    margin: 0;
+  }
+
+  .experience-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: auto;
+    background: rgba(var(--distro-rgb), 0.15);
+    border: 1px solid rgba(var(--distro-rgb), 0.35);
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+
+  .distro-window:hover .experience-badge {
+    background: rgba(var(--distro-rgb), 0.3);
+    border-color: rgba(var(--distro-rgb), 0.55);
+    transform: translateY(-2px);
+  }
+
+  .pulse-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--distro-color);
+    animation: pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    box-shadow: 0 0 6px var(--distro-color);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.8); }
+  }
+
+  .glow-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    box-shadow: inset 0 0 50px rgba(var(--distro-rgb), 0.15);
+    border: 1px solid transparent;
+  }
+
+  .distro-window:hover .glow-overlay {
+    opacity: 1;
+    border-color: rgba(var(--distro-rgb), 0.35);
+  }
+</style>

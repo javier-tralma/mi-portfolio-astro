@@ -1,0 +1,36 @@
+---
+import { Globe } from "@lucide/astro";
+import { getLangFromUrl, getRouteFromUrl } from "../i18n/utils";
+import type { UILanguage } from "../i18n/types";
+
+const lang = getLangFromUrl(Astro.url);
+const route = getRouteFromUrl(Astro.url);
+
+const langs: { code: UILanguage; label: string }[] = [
+  { code: "es", label: "ES" },
+  { code: "en", label: "EN" },
+];
+---
+
+<div class="flex items-center gap-1 ml-1">
+  <Globe class="w-3.5 h-3.5 text-text-secondary" />
+  {
+    langs.map((l, i) => (
+      <>
+        <a
+          href={l.code === "es" ? route : `/en${route === "/" ? "" : route}`}
+          class:list={[
+            "text-xs font-medium px-1.5 py-0.5 rounded transition-colors duration-200",
+            l.code === lang
+              ? "text-white bg-white/[0.1]"
+              : "text-text-secondary hover:text-white",
+          ]}
+          aria-label={`${l.code === "es" ? "Cambiar a Español" : "Switch to English"}`}
+        >
+          {l.label}
+        </a>
+        {i === 0 && <span class="text-text-secondary/40 text-xs">/</span>}
+      </>
+    ))
+  }
+</div>

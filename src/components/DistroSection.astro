@@ -1,0 +1,208 @@
+---
+import { Terminal } from "@lucide/astro";
+import DistroCard from "./DistroCard.astro";
+import { getDistroDescriptions, getDistroMeta } from "../i18n/ui";
+import { getLangFromUrl } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const distroMeta = getDistroMeta(lang);
+const distroDescriptions = getDistroDescriptions(lang);
+
+const distroItems = [
+  {
+    name: "Arch Linux",
+    experienceKey: "daily",
+    color: "#1793D1",
+    isMain: true,
+  },
+  {
+    name: "Ubuntu",
+    experienceKey: "medium",
+    color: "#E95420",
+  },
+  {
+    name: "Fedora",
+    experienceKey: "advanced",
+    color: "#51A2DA",
+  },
+  {
+    name: "Linux Mint",
+    experienceKey: "basic",
+    color: "#87CF3E",
+  },
+  {
+    name: "Debian",
+    experienceKey: "medium",
+    color: "#D70A53",
+  },
+];
+
+const distros = distroItems.map((distro, index) => ({
+  ...distro,
+  description: distroDescriptions[index]?.description ?? "",
+  experience: distroMeta.experience[distro.experienceKey] ?? distro.experienceKey,
+}));
+---
+
+<section id="distros" class="relative py-24 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6">
+    <!-- Section Header -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 px-2">
+      <div class="flex items-center gap-3">
+        <Terminal class="w-6 h-6 text-text-accent" />
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+          {distroMeta.title}
+        </h2>
+      </div>
+      <p class="text-sm text-text-secondary max-w-md">
+        {distroMeta.subtitle}
+      </p>
+    </div>
+
+    <!-- Desktop (>=1024px): horizontal flex wrap, centered rows -->
+    <div class="distro-desktop-container">
+      {distros.map((distro) => (
+        <DistroCard
+          name={distro.name}
+          description={distro.description}
+          experience={distro.experience}
+          color={distro.color}
+          isMain={distro.isMain}
+          mainBadgeLabel={distroMeta.mainBadge}
+        />
+      ))}
+    </div>
+
+    <!-- Mobile/Tablet (<1024px): horizontal scroll with snap -->
+    <div class="distro-scroll-wrapper lg:hidden">
+      <div class="edge-fade left"></div>
+      <div class="edge-fade right"></div>
+
+      <div class="distro-scroll-container">
+        {distros.map((distro) => (
+          <DistroCard
+            name={distro.name}
+            description={distro.description}
+            experience={distro.experience}
+            color={distro.color}
+            isMain={distro.isMain}
+            mainBadgeLabel={distroMeta.mainBadge}
+          />
+        ))}
+      </div>
+    </div>
+
+    <!-- Scroll hint (mobile/tablet only) -->
+    <div class="scroll-hint">
+      <span>{distroMeta.scrollHint}</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14"></path>
+        <path d="m12 5 7 7-7 7"></path>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Desktop: horizontal flex, wraps to rows if needed, never single column */
+  .distro-desktop-container {
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 2rem 0;
+  }
+
+  @media (min-width: 1024px) {
+    .distro-desktop-container {
+      display: flex;
+    }
+  }
+
+  /* Mobile/Tablet Horizontal Scroll */
+  .distro-scroll-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .distro-scroll-container {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 2rem 1.5rem;
+    justify-content: center;
+  }
+
+  .distro-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Edge fade gradients */
+  .edge-fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .edge-fade.left {
+    left: 0;
+    background: linear-gradient(to right, #0a0a0a, transparent);
+  }
+
+  .edge-fade.right {
+    right: 0;
+    background: linear-gradient(to left, #0a0a0a, transparent);
+  }
+
+  @media (max-width: 1023px) {
+    .edge-fade {
+      opacity: 1;
+    }
+    .distro-scroll-container {
+      justify-content: flex-start;
+      padding: 2rem 2rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .distro-scroll-container {
+      gap: 1rem;
+      padding: 1.5rem 1.5rem;
+    }
+    .edge-fade {
+      width: 48px;
+    }
+  }
+
+  /* Scroll hint */
+  .scroll-hint {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 0.5rem;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.25);
+    animation: hint-pulse 2.5s ease-in-out infinite;
+  }
+
+  @media (max-width: 1023px) {
+    .scroll-hint {
+      display: flex;
+    }
+  }
+
+  @keyframes hint-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+</style>

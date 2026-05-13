@@ -1,0 +1,99 @@
+---
+import { ExternalLink, FolderGit, Recycle, LayoutDashboard, Globe, Terminal } from "@lucide/astro";
+import { getProjects } from "../i18n/ui";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const projectTranslations = getProjects(lang);
+
+const projectMeta = [
+  {
+    tags: ["FastAPI", "Python", "Multi-threading"],
+    size: "large",
+    icon: Globe,
+  },
+  {
+    tags: ["React", "TypeScript", "AWS"],
+    size: "medium",
+    icon: Recycle,
+  },
+  {
+    tags: ["Angular", "Linux", "FastAPI"],
+    size: "medium",
+    icon: LayoutDashboard,
+  },
+  {
+    tags: ["Linux", "Networking", "Security"],
+    size: "medium",
+    icon: Terminal,
+  },
+];
+
+const projects = projectMeta.map((meta, index) => ({
+  ...meta,
+  ...projectTranslations[index],
+}));
+---
+
+<section id="projects" class="relative px-6 py-24">
+  <div class="max-w-7xl mx-auto">
+    <!-- Section Header -->
+    <div class="flex items-center gap-3 mb-12">
+      <FolderGit class="w-6 h-6 text-text-accent" />
+      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+        {t("projects.title")}
+      </h2>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[minmax(220px,auto)]">
+      {projects.map((project, index) => (
+        <div
+          class:list={[
+            "group relative flex flex-col justify-between p-6 sm:p-7 rounded-3xl border-[1.5px] border-white/[0.08] bg-[#141414]/40 backdrop-blur-md transition-all duration-300 hover:bg-[#141414]/70 hover:border-white/[0.14] hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/40",
+            {
+              "lg:row-span-2": project.size === "tall",
+              "md:col-span-2 lg:col-span-2": project.size === "wide",
+            },
+          ]}
+        >
+          <!-- Top row: Icon + External Link -->
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center justify-center w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.06] text-text-accent group-hover:scale-110 transition-transform duration-300">
+              <project.icon class="w-5 h-5" />
+            </div>
+            <button
+              class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2 rounded-full hover:bg-white/[0.08] text-text-secondary hover:text-white"
+              aria-label={`${t("projects.viewProject")} ${project.title}`}
+            >
+              <ExternalLink class="w-4 h-4" />
+            </button>
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1">
+            <h3 class="text-lg sm:text-xl font-semibold text-white mb-2 tracking-tight">
+              {project.title}
+            </h3>
+            <p class="text-sm leading-relaxed text-text-secondary mb-4">
+              {project.description}
+            </p>
+          </div>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-2 mt-auto">
+            {project.tags.map((tag) => (
+              <span class="px-2.5 py-1 rounded-lg text-[11px] font-medium tracking-wide uppercase bg-white/[0.04] border border-white/[0.06] text-text-secondary">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          <!-- Subtle gradient overlay on hover -->
+          <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-text-accent/[0.03] to-transparent"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
