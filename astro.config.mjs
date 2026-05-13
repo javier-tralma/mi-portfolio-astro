@@ -3,7 +3,9 @@ import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  site: "https://yourdomain.com",
+  site: "https://mi-portfolio-astro.vercel.app/",
+  base: "/",
+  outDir: "dist",
   devToolbar: {
     enabled: false,
   },
